@@ -17,7 +17,7 @@ class BertNer(object):
         from bert.tokenization import FullTokenizer
         self.tokenizer = FullTokenizer(os.path.join(self.model_dir, 'vocab.txt'))
         
-        self.ner_sq_len = kwargs['ner_sq_len']
+        self.ner_sq_len = 128
         self.input_ids = self.tf.placeholder(self.tf.int32, (None, self.ner_sq_len), 'input_ids')
         self.input_mask = self.tf.placeholder(self.tf.int32, (None, self.ner_sq_len), 'input_mask')
 
@@ -266,7 +266,7 @@ class BertNer(object):
 if __name__ == '__main__':
     str1 = '1995年，湖北农民万其珍应下叔叔万述荣的临终嘱托，成为万家第三代义渡艄公。11年后的2016年，他的儿子万芳权接过父亲手中的船桨，将祖上传下来的“义渡”承诺再次传承。就这样，从万家爷爷，'
     str2 = '两年前，来自上海的“高龄产妇”周月（化名），在香港顺产生下了一个活泼可爱的女儿。这是一个试管婴儿，回想起从在香港检查出内膜移位，到取卵，再到孕育的过程，周月至今仍觉得不可思议。'
-    bn = BertNer(gpu_no=0, log_dir='log/', verbose=True, ner_model=r'bert_ner_model\\', ner_sq_len=128)
+    bn = BertNer(gpu_no=0, log_dir='log/', verbose=True, ner_model=r'bert_ner_model\\')
     print(bn.predict(['小张']))
     # req_list = []
     # for i in range(20):
