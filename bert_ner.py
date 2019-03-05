@@ -10,7 +10,7 @@ __all__ = ['BertNer']
 
 class BertNer(object):
     def __init__(self, **kwargs):
-        self.tf = import_tf(kwargs['gpu_no'])
+        self.tf = import_tf(kwargs['gpu_no'], kwargs['verbose'])
         self.logger = set_logger('BertNer', kwargs['log_dir'], kwargs['verbose'])
         self.model_dir = kwargs['ner_model']
 
@@ -262,15 +262,3 @@ class BertNer(object):
             i += 1
 
         return _ner_list
-
-if __name__ == '__main__':
-    str1 = '1995年，湖北农民万其珍应下叔叔万述荣的临终嘱托，成为万家第三代义渡艄公。11年后的2016年，他的儿子万芳权接过父亲手中的船桨，将祖上传下来的“义渡”承诺再次传承。就这样，从万家爷爷，'
-    str2 = '两年前，来自上海的“高龄产妇”周月（化名），在香港顺产生下了一个活泼可爱的女儿。这是一个试管婴儿，回想起从在香港检查出内膜移位，到取卵，再到孕育的过程，周月至今仍觉得不可思议。'
-    bn = BertNer(gpu_no=0, log_dir='log/', verbose=True, ner_model=r'bert_ner_model\\')
-    print(bn.predict(['小张']))
-    # req_list = []
-    # for i in range(20):
-    #     req_list.append(str1)
-    #     req_list.append(str2)
-    # while True:
-    #     print(bn.predict(req_list))
