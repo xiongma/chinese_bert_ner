@@ -6,9 +6,9 @@
         bn = BertNer(gpu_no=0, log_dir='log/', verbose=True, ner_model=r'bert_ner_model\\')
     * second
          ````python 
-        bn.predict(['小张'])
+         bn.predict(['两年前，来自上海的“高龄产妇”周月（化名），在香港顺产生下了一个活泼可爱的女儿', '湖北农民万其珍应下叔叔万述荣的临终嘱托，成为万家第三代义渡艄公'])
     * third 
-        > you will get result like this [[['张', 'PER']]], every element of list is ner of content
+        > you will get result like this [[['上海', 'LOC'], ['周月', 'PER'], ['香港', 'LOC']], [['湖北', 'LOC'], ['万其珍', 'PER'], ['万述荣', 'PER']]], every element of list is ner of content
      
 # Parameter
 | name | type | detail |
