@@ -189,27 +189,50 @@ class BertNer(object):
             index_result.append(curr_idx)
         return result, index_result
 
-    def predict(self, content_list):
+    def predict(self, contents):
         """
         bert ner predict
         :param content_list: content list
         :return: predict result
         """
-        ner_result = None
         try:
-            tmp_f = list(self._convert_lst_to_features(content_list))
+            splited_contents = []
+            all_terms = []
+            for content in contents:
+                content_len = len(content)
+                if content_len % self.ner_sq_len - 2 == 0:
+                    terms = int(content_len / (self.ner_sq_len - 2))
+                else:
+                    terms = int(content_len / (self.ner_sq_len - 2)) + 1
+                all_terms.append(terms)
 
+                for i in range(terms):
+                    splited_contents.append(content[i * (self.ner_sq_len - 2): (i + 1) * (self.ner_sq_len - 2)])
+
+            tmp_f = list(self._convert_lst_to_features(splited_contents))
             input_ids = [f.input_ids for f in tmp_f]
             input_masks = [f.input_mask for f in tmp_f]
 
             pred_result = self.sess.run(self.pred_ids, feed_dict={self.input_ids: input_ids,
-                                                                     self.input_mask: input_masks})
+                                                                  self.input_mask: input_masks})
+
+            # restore to original string
+            tmp = []
+            index = 0
+            for terms in all_terms:
+                sub_preds = []
+                for i in range(terms):
+                    sub_preds.extend(pred_result[index + i])
+                tmp.append(sub_preds)
+                index += terms
+
+            pred_result = tmp
 
             pred_result = self._convert_id_to_label(pred_result, len(pred_result))[0]
 
             # zip str predict id
             str_pred = []
-            for w in zip(content_list, pred_result):
+            for w in zip(contents, pred_result):
                 sub_list = []
                 for z in zip(list(w[0]), w[1]):
                     sub_list.append([z[0], z[1]])
@@ -218,12 +241,11 @@ class BertNer(object):
 
             # get ner
             ner_result = [self._combine_ner(s) for s in str_pred]
+            return ner_result
 
         except Exception as e:
             self.logger.error(e)
-
-        finally:
-            return ner_result
+            return [[]]
 
     def _combine_ner(self, pred_result):
         """
@@ -253,7 +275,7 @@ class BertNer(object):
 
             elif word[1][0] == 'B':
                 if tmp is not '':
-                    _ner_list.append([tmp, word[1][2:]])
+                    _ner_list.append([tmp, pred_result[i-1][1][2:]])
 
                 tmp = word[0]
                 if i == words_len-1:
